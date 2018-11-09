@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Timer;
@@ -6,11 +8,13 @@ import java.util.TimerTask;
 
 class MainFrame extends JFrame {
     private JPanel NorthPanle; // 仪表盘面板
+    private JToggleButton  turnLeft;// 左转按钮
+    private JToggleButton  turnRight;// 右转按钮
 
     private static int x;
     private static int y;
     private static int r = 400;
-    private static boolean flag = false;
+    private static boolean flag = false; // 加速减速标记
     private static double start = 0;
     private Timer timer;
 
@@ -21,9 +25,19 @@ class MainFrame extends JFrame {
         // 减速按钮
         JButton slowDown = new JButton("减速");
         // 左转按钮
-        JButton turnLeft = new JButton("左转");
+        turnLeft = new JToggleButton("左转");
         // 右转按钮
-        JButton turnRight = new JButton("右转");
+        turnRight = new JToggleButton("右转");
+        turnRight.addChangeListener(e -> {
+            JToggleButton toggleBtn = (JToggleButton) e.getSource();
+            if (toggleBtn.isSelected())
+                turnLeft.setSelected(false);
+        });
+        turnLeft.addChangeListener(e -> {
+            JToggleButton toggleBtn = (JToggleButton) e.getSource();
+            if (toggleBtn.isSelected())
+                turnRight.setSelected(false);
+        });
         speedUp.addMouseListener(new printSpeedUp());
         slowDown.addMouseListener(new printSlowDown());
         // 按钮面板
@@ -85,7 +99,7 @@ class MainFrame extends JFrame {
         newTimer.schedule(new TimerTask() {
             public void run() {
                 if (flag) {
-                    if(start >= 0) {
+                    if (start >= 0) {
                         NorthPanle.repaint();
                         start -= 0.5;
                         printPoint(start * Math.PI / 180);
@@ -105,6 +119,11 @@ class MainFrame extends JFrame {
             int X[] = {x, x - 350, x - 350, x, x};
             int Y[] = {y - 5, y - 1, y + 1, y + 3, y - 3};
             g2d.fillPolygon(X, Y, 5);
+            if(turnRight.isSelected()){
+                g2d.setColor(new Color(255, 69, 0));
+                int sX[] = {x, x - 350, x - 350, x, x};
+                int sY[] = {y - 5, y - 1, y + 1, y + 3, y - 3};
+            }
         });
     }
 
@@ -121,7 +140,6 @@ class MainFrame extends JFrame {
                         start += 0.5;
                         printPoint(start * Math.PI / 180);
                     }
-                    System.out.println("mousePressed");
                 }
             }, 0, 100);
         }
@@ -130,7 +148,6 @@ class MainFrame extends JFrame {
         public void mouseReleased(MouseEvent e) {
             timer.cancel();
             flag = true;
-            System.out.println("mouseReleased");
         }
     }
 
@@ -138,24 +155,23 @@ class MainFrame extends JFrame {
     class printSlowDown extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
+            flag = false;
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 public void run() {
                     if(start >= 0) {
                         NorthPanle.repaint();
-                        start -= 0.5;
+                        start -= 1;
                         printPoint(start * Math.PI / 180);
                     }
-                    System.out.println("mousePressed");
                 }
             }, 0,100);
-            System.out.println("mousePressed");
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             timer.cancel();
-            System.out.println("mouseReleased");
+            flag = true;
         }
     }
 }
