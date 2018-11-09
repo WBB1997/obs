@@ -99,11 +99,11 @@ class MainFrame extends JFrame {
         newTimer.schedule(new TimerTask() {
             public void run() {
                 if (flag) {
-                    if (start >= 0) {
-                        NorthPanle.repaint();
+                    System.out.println(start);
+                    if (start >= 0)
                         start -= 0.5;
-                        printPoint(start * Math.PI / 180);
-                    }
+                    NorthPanle.repaint();
+                    printPoint(start * Math.PI / 180);
                 }
             }
         }, 0, 100);
@@ -119,11 +119,21 @@ class MainFrame extends JFrame {
             int X[] = {x, x - 350, x - 350, x, x};
             int Y[] = {y - 5, y - 1, y + 1, y + 3, y - 3};
             g2d.fillPolygon(X, Y, 5);
-            if(turnRight.isSelected()){
-                g2d.setColor(new Color(255, 69, 0));
-                int sX[] = {x, x - 350, x - 350, x, x};
-                int sY[] = {y - 5, y - 1, y + 1, y + 3, y - 3};
-            }
+            g2d = (Graphics2D) NorthPanle.getGraphics();
+            g2d.setColor(new Color(255, 69, 0));
+            int lX[] = {20, 60, 60, 120, 120, 60, 60, 20};
+            int lY[] = {100, 40, 70, 70, 130, 130, 160, 100};
+            if (turnLeft.isSelected())
+                g2d.fillPolygon(lX, lY, 8);
+            else
+                g2d.drawPolygon(lX, lY, 8);
+            int rX[] = {970, 930, 930, 870, 870, 930, 930, 970};
+            int rY[] = {100, 40, 70, 70, 130, 130, 160, 100};
+            if (turnRight.isSelected())
+                g2d.fillPolygon(rX, rY, 8);
+            else
+                g2d.drawPolygon(rX, rY, 8);
+            g2d.dispose();
         });
     }
 
@@ -135,7 +145,7 @@ class MainFrame extends JFrame {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 public void run() {
-                    if (start <= 180) {
+                    if (start <= 179.5) {
                         NorthPanle.repaint();
                         start += 0.5;
                         printPoint(start * Math.PI / 180);
@@ -159,7 +169,7 @@ class MainFrame extends JFrame {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 public void run() {
-                    if(start >= 0) {
+                    if(start >= 1) {
                         NorthPanle.repaint();
                         start -= 1;
                         printPoint(start * Math.PI / 180);
