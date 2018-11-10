@@ -6,20 +6,28 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MyPanle extends JPanel implements Observer {
-    private static int x = 0;
-    private static int y = 0;
+public class MyPanel extends JPanel implements Observer {
 
+    // 左转按钮
+    private JToggleButton turnLeft = new JToggleButton("",false);
+    // 右转按钮
+    private JToggleButton turnRight = new JToggleButton("",false);
+
+
+
+    private static int x = 0; // 圆心X坐标
+    private static int y = 0; // 圆形Y坐标
     private static boolean flag = true; // 加速减速标记
     private static boolean constant = false; // 定速巡航标记
-    private static double start = 0;
+    private static double start = 0; // 速度
     private Timer timer;
 
     private JPanel tmp;
 
-    MyPanle() {
+    MyPanel() {
         super();
         tmp = this;
+        // 按钮没有点击时，速度自动下降
         new Timer().schedule(new TimerTask() {
             public void run() {
                 if (!flag) {
@@ -36,9 +44,10 @@ public class MyPanle extends JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        SpeedControl.bean b = (SpeedControl.bean) arg;
-        flag = b.getFlag();
+        Bean b = (Bean) arg;
+        // 如果是SpeedControl
         if (o instanceof SpeedControl) {
+            flag = b.getFlag();
             if (b.getButton()) {
                 if (flag) {
                     timer = new Timer();
@@ -68,9 +77,19 @@ public class MyPanle extends JPanel implements Observer {
                 } else
                     timer.cancel();
             }
+        }else{ // 如果是DirectionControl
+            if (b.getButton()) {
+                turnLeft.setSelected(!turnLeft.isSelected());
+                turnRight.setSelected(false);
+            } else {
+                turnLeft.setSelected(false);
+                turnRight.setSelected(!turnRight.isSelected());
+            }
         }
     }
 
+    // 画面板
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         x = this.getWidth() / 2;
@@ -129,16 +148,16 @@ public class MyPanle extends JPanel implements Observer {
             g2d.setColor(new Color(255, 69, 0));
             int lX[] = {20, 60, 60, 120, 120, 60, 60, 20};
             int lY[] = {100, 40, 70, 70, 130, 130, 160, 100};
-//            if (this.isSelected())
-//                g2d.fillPolygon(lX, lY, lX.length);
-//            else
-//                g2d.drawPolygon(lX, lY, lX.length);
-//            int rX[] = {970, 930, 930, 870, 870, 930, 930, 970};
-//            int rY[] = {100, 40, 70, 70, 130, 130, 160, 100};
-//            if (this.isSelected())
-//                g2d.fillPolygon(rX, rY, rX.length);
-//            else
-//                g2d.drawPolygon(rX, rY, rX.length);
+            if (turnLeft.isSelected())
+                g2d.fillPolygon(lX, lY, lX.length);
+            else
+                g2d.drawPolygon(lX, lY, lX.length);
+            int rX[] = {970, 930, 930, 870, 870, 930, 930, 970};
+            int rY[] = {100, 40, 70, 70, 130, 130, 160, 100};
+            if (turnRight.isSelected())
+                g2d.fillPolygon(rX, rY, rX.length);
+            else
+                g2d.drawPolygon(rX, rY, rX.length);
             g2d.dispose();
         });
     }
